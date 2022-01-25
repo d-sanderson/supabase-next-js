@@ -26,6 +26,7 @@ export default function Home({ posts }) {
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
     })
+    console.log(session)
   }, [])
 
   const handleLogout = async () => {
@@ -37,6 +38,7 @@ export default function Home({ posts }) {
   return (
     <div className={styles.container}>
       <nav>
+        {session.user.email && <p>Welcome back {session.user.email}</p>}
         <ul>
           {!session && (
             <>

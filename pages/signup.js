@@ -1,19 +1,18 @@
-import { useRouter } from "next/router"
 import Link from "next/link"
 import supabase from "../utils/supabase"
 import { useState } from 'react'
 import Form from "../components/Form.js"
 
 export default function SignupPage() {
-  const router = useRouter()
   const [error, setError] = useState({})
+  const [submitted, setSubmitted] = useState(false)
 
   async function handleSubmit(event) {
     event.preventDefault()
     const email = event.target.email.value
     const password = event.target.password.value
     console.log({ email, password })
-    const { user, session, error } = await supabase.auth.signUp({
+    const { user, error } = await supabase.auth.signUp({
       email,
       password,
     })
@@ -22,7 +21,7 @@ export default function SignupPage() {
         setError({ status, message })
       }
     if (user) {
-      router.push("/")
+      setSubmitted(true)
     }
   }
 
@@ -35,8 +34,11 @@ export default function SignupPage() {
         </Link>
       </span>
       <Form handleSubmit={handleSubmit} fields={['email', 'password']} submitText="Sign up"/>
+      {submitted && (
+        <div className="alert__success">You have successfully signed up please check your email</div>
+      )}
       {error && (
-        <div>
+        <div className="failure">
           {error && error.status}
           {error && error.message}
         </div>
