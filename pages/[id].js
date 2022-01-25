@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import styles from "../styles/Home.module.css"
 import supabase from "../utils/supabase"
-
+import Form from "../components/Form"
 export async function getServerSideProps({ params }) {
   let { data: post, error } = await supabase
     .from("posts")
@@ -25,6 +25,7 @@ export default function PostPage({ post }) {
     const subscription = supabase
       .from("comments")
       .on("INSERT", (payload) => {
+        console.log(payload)
         setComments((prev) => [...prev, payload.new])
       })
       .subscribe()
@@ -35,7 +36,6 @@ export default function PostPage({ post }) {
     event.preventDefault()
     const content = event.target.content.value
     const user_id = supabase.auth.user().id
-    console.log(user_id)
     const { data, error } = await supabase
       .from("comments")
       .insert([{ user_id: supabase.auth.user.id, post_id: post.id, content }])
@@ -52,11 +52,11 @@ export default function PostPage({ post }) {
         <p>{post.content}</p>
         <pre>{JSON.stringify(comments, null, 2)}</pre>
       </div>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="content">content</label>
-        <input type="text" id="content" name="content" />
-        <button type="submit">Submit</button>
-      </form>
+      <Form
+        handleSubmit={handleSubmit}
+        fields={[{ name: "content", type: "text" }]}
+        submitText="Submit"
+      />
     </>
   )
 }

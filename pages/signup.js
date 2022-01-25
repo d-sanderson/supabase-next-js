@@ -11,7 +11,6 @@ export default function SignupPage() {
     event.preventDefault()
     const email = event.target.email.value
     const password = event.target.password.value
-    console.log({ email, password })
     const { user, error } = await supabase.auth.signUp({
       email,
       password,
@@ -33,7 +32,7 @@ export default function SignupPage() {
           <a>Login</a>
         </Link>
       </span>
-      <Form handleSubmit={handleSubmit} fields={['email', 'password']} submitText="Sign up"/>
+      <Form handleSubmit={handleSubmit} submitText="Sign up"/>
       {submitted && (
         <div className="alert__success">You have successfully signed up please check your email</div>
       )}

@@ -5,7 +5,6 @@ import supabase from "../utils/supabase"
 
 export async function getStaticProps() {
   let { data: posts, error } = await supabase.from("posts")
-  console.log(error)
   if (error) {
     throw new Error(JSON.stringify(error))
   }
@@ -34,6 +33,7 @@ export default function Home({ posts }) {
       alert(`Error signing out ${JSON.stringify(error, null, 2)}`)
     }
   }
+  console.log(posts)
   return (
     <div className={styles.container}>
       <nav>
@@ -63,7 +63,19 @@ export default function Home({ posts }) {
       {!session ? (
         "login to see posts"
       ) : (
-        <pre>{JSON.stringify(posts, null, 2)}</pre>
+        <pre>
+          {posts.map((post) => (
+            <div>
+              <h2>
+                <Link href={`${post.id}`}>
+                  <a>{post.title}</a>
+                </Link>
+              </h2>
+              <h3>{post.created_at}</h3>
+              <p>{post.content}</p>
+            </div>
+          ))}
+        </pre>
       )}
     </div>
   )

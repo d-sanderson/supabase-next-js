@@ -10,7 +10,6 @@ export default function LoginPage() {
     event.preventDefault()
     const email = event.target.email.value
     const password = event.target.password.value
-    console.log({ email, password })
     const { user, session, error } = await supabase.auth.signIn({
       email,
       password,
@@ -32,7 +31,7 @@ export default function LoginPage() {
           <a>Sign up</a>
         </Link>
       </span>
-      <Form handleSubmit={handleSubmit} fields={['email', 'password']} submitText="Login"/>
+      <Form handleSubmit={handleSubmit} submitText="Login"/>
       {error && (
         <div>
           {error && error.status}
