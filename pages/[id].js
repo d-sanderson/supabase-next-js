@@ -20,6 +20,7 @@ export async function getServerSideProps({ params }) {
 
 export default function PostPage({ post }) {
   const [comments, setComments] = useState(post.comments)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     const subscription = supabase
@@ -35,10 +36,14 @@ export default function PostPage({ post }) {
   async function handleSubmit(event) {
     event.preventDefault()
     const content = event.target.content.value
-    const user_id = supabase.auth.user().id
+    const user_id = supabase.auth.user()?.id
+    if (!user_id) {
+      setError("You must be logged in to comment!")
+      return
+    }
     const { data, error } = await supabase
       .from("comments")
-      .insert([{ user_id: supabase.auth.user.id, post_id: post.id, content }])
+      .insert([{ user_id, post_id: post.id, content }])
 
     if (error) {
       throw new Error(JSON.stringify(error))
@@ -57,6 +62,7 @@ export default function PostPage({ post }) {
         fields={[{ name: "content", type: "text" }]}
         submitText="Submit"
       />
+      {error && error}
     </>
   )
 }

@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react"
 import styles from "../styles/Home.module.css"
 import Link from "next/link"
 import supabase from "../utils/supabase"
+import useSupabaseSession from "../components/hooks/useSupabaseSession"
 
 export async function getStaticProps() {
   let { data: posts, error } = await supabase.from("posts")
@@ -17,15 +17,7 @@ export async function getStaticProps() {
 }
 
 export default function Home({ posts }) {
-  const [session, setSession] = useState(null)
-
-  useEffect(() => {
-    setSession(supabase.auth.session())
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
-  }, [])
+  const { session, setSession } = useSupabaseSession()
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut()
@@ -39,6 +31,11 @@ export default function Home({ posts }) {
       <nav>
         {session?.user?.email && <p>Welcome back {session.user.email}</p>}
         <ul>
+          <li>
+            <Link href="/create">
+              <a>Create Post</a>
+            </Link>
+          </li>
           {!session && (
             <>
               <li>
