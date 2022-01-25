@@ -43,7 +43,6 @@ export default function PostPage({ post }) {
     if (error) {
       throw new Error(JSON.stringify(error))
     }
-    console.log(data)
   }
 
   return (
