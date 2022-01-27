@@ -1,7 +1,7 @@
 import styles from "../styles/Home.module.css"
 import Link from "next/link"
 import supabase from "../utils/supabase"
-import useSupabaseSession from "../components/hooks/useSupabaseSession"
+import useSession from "../context/sessions"
 
 export async function getStaticProps() {
   let { data: posts, error } = await supabase.from("posts")
@@ -17,15 +17,13 @@ export async function getStaticProps() {
 }
 
 export default function Home({ posts }) {
-  const { session, setSession } = useSupabaseSession()
-
+  const { session } = useSession()
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut()
     if (error) {
       alert(`Error signing out ${JSON.stringify(error, null, 2)}`)
     }
   }
-  console.log(posts)
   return (
     <div className={styles.container}>
       <nav>

@@ -1,34 +1,42 @@
 import { useEffect, useState } from "react"
+import { useRouter } from "next/router"
 import styles from "../styles/Home.module.css"
 import supabase from "../utils/supabase"
 import Form from "../components/Form"
+
 export async function getServerSideProps({ params }) {
   let { data: post, error } = await supabase
     .from("posts")
     .select("*,comments(*)")
     .eq("id", params.id)
     .single()
-  if (error) {
-    throw new Error(JSON.stringify(error))
+  if (!post) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
   }
+
   return {
     props: {
-      post: post,
+      post: post || null,
+      error: error,
     },
   }
 }
 
 export default function PostPage({ post }) {
-  const [comments, setComments] = useState(post.comments)
+  const [comments, setComments] = useState(post?.comments)
   const [error, setError] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
+    if (!post) return
     const subscription = supabase
       .from("comments")
-      .on("INSERT", (payload) => {
-        console.log(payload)
-        setComments((prev) => [...prev, payload.new])
-      })
+      .on("INSERT", (payload) => setComments((prev) => [...prev, payload.new]))
       .subscribe()
     return () => supabase.removeSubscription(subscription)
   }, [])
@@ -48,13 +56,14 @@ export default function PostPage({ post }) {
     if (error) {
       throw new Error(JSON.stringify(error))
     }
+    console.log(data)
   }
-
   return (
     <>
       <div className={styles.container}>
         {post.title}
         <p>{post.content}</p>
+        <pre>{JSON.stringify(post, null, 2)}</pre>
         <pre>{JSON.stringify(comments, null, 2)}</pre>
       </div>
       <Form
